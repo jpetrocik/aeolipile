@@ -65,13 +65,13 @@ public class SteamUser {
 	}
 	
 
-	public String toSAS_ID(){
+	public String toSAS_Status(){
 		return steamID +","+ status+";\n";
 	}
 	
 	
 	public String toSASProfile(){
-		return steamID +","+ personaname+", "+avatar32+", "+avatar64+
+		return steamID +":"+ personaname+", "+avatar32+", "+avatar64+
 				", "+avatar184+", "+personaState+";\n";
 	}
 	
@@ -96,26 +96,28 @@ public class SteamUser {
 	}
 	
 	
-	//TODO Friends List
-	//an array of friend ID's - need to know how SAS will read this.
 	/**
-	 * Get's a given players Friends List and makes it a string.
+	 * @return a given players Friends List and makes it a string.
 	 * Makes a new line at the end.
-	 * @return
+	 * 
 	 */
-	public String getPlayerFriendsListString(){
-		String friendOutput = null;
-		for(int i=0; i<friends.size(); i++){
-			friendOutput = friendOutput+","+friends.get(i).getID(); 
+	public String getFriendsString(){
+		if(friends.size()>0){
+			String friendOutput= Long.toString(friends.get(0).getID());
+			for(int i=1; i<friends.size(); i++){
+				friendOutput = friendOutput+","+friends.get(i).getID(); 
+			}
+			return friendOutput+";\n";
 		}
-		return friendOutput+";\n";
+		else
+			return "Private";
 	}
 	
 	
 	//TODO GetOwnedGames
 	//Need a sparce matrix
 	//appID, name, play_time_2_week, pay_time_total
-	public String getPlayerOwnedGames(){
+	public String getOwnedGames(){
 		return null;
 	}
 	//TODO FromFile method, need to read from a file

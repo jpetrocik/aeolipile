@@ -24,39 +24,34 @@ public class Engine {
 	public void startEngine(long startID){
 		
 		LinkedList<SteamUser> queue = new LinkedList<SteamUser>();
-		//TODO Find a better purpose for the HashMap
 		HashMap<Long, SteamUser> scrapedUsers = new HashMap<Long, SteamUser>(); 
 		SteamGetter getter = new SteamGetter();
 		
 		try {
-//			PrintWriter pw = new PrintWriter(new FileWriter("SteamUsers.txt"));
 			queue.add(new SteamUser(startID)); //Add first user
-			
+			out = new Outfile();
 			while(!queue.isEmpty()){
 				
-				SteamUser curUser = queue.removeFirst();//gets a single individuals Profile info
-				
+				//gets a single individuals Profile info
+				SteamUser curUser = queue.removeFirst();
 				if(!scrapedUsers.containsKey(curUser.getID())){
-					curUser = getter.getPlayerSummary(curUser); 
+					
+					curUser = getter.getPlayerSummary(curUser);
+					out.writeProfileOf(curUser);
+					
 					ArrayList<SteamUser> friends = getter.userFriendData(curUser);
 					for(SteamUser freind: friends){
 						queue.add(freind);
 						curUser.addFriend(freind);
-//						pw.println(curUser.getID());
-//						pw.flush();
 						scrapedUsers.put(curUser.getID(), curUser);
-				//		System.out.println(curUser.getID() + " scraped");
 					}
-					out = new Outfile(friends);
-//					pw.println(curUser.getID());
-//					pw.flush();
+					out.writeFriendsOf(curUser);
+					out.flush();
 					
 					scrapedUsers.put(curUser.getID(), curUser);
 					System.out.println(curUser.getID() + " scraped");
-					
 				}
 			}
-//			pw.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

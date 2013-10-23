@@ -24,8 +24,6 @@ public class SteamGetter {
 	int personaState;
 	JsonReader reader;
 
-	ArrayList<SteamProfile> friends;
-
 	public SteamGetter(){}
 
 	private URL connect(String URL, long id) throws MalformedURLException{

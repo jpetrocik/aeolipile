@@ -14,93 +14,78 @@ import java.util.Calendar;
  * @author summersb
  *
  */
-
-
 public class Outfile extends Thread{
-	BufferedWriter bw;
-	FileWriter fw;
-	File file;
-	Calendar now;
+	private BufferedWriter bw;
+	private FileWriter fw;
+	private File file;
+	private Calendar now;
 	
 	
 	/**
-	 * Constructor for the Outfile class. Generates or edits the
-	 * file being used for the day.
+	 * Constructor for the Outfile class. Creates file if needed otherwise
+	 * appends data to end of current file.
 	 * 
-	 * @param friend - receives an arraylist of SteamFriends
 	 * @throws IOException
 	 */
-	public Outfile(ArrayList<SteamUser> friend) throws IOException {
+	public Outfile() throws IOException {
 		now = Calendar.getInstance();
 //		File dir = new File (Global.ASSETSPWD);//set the directory address
 		file = new File( 			
 				Global.AEOLIPILE+
 				"_"+now.get(Calendar.YEAR)+
-				"_"+now.get(Calendar.MONTH)+
+				"_"+(now.get(Calendar.MONTH)+1)+
 				"_"+now.get(Calendar.DAY_OF_MONTH)+".txt");
-//				file = new File(dir, 			
-//				Global.AEOLIPILE+
-//				"_"+now.get(Calendar.YEAR)+
-//				"_"+now.get(Calendar.MONTH)+
-//				"_"+now.get(Calendar.DAY_OF_MONTH)+".txt");
+		
+		
+		
 		if (!file.exists()) {
 			file.setWritable(true);
 			file.setReadable(true);
 			file.createNewFile();
-			
-		//	editFile(friend);
+			fw = new FileWriter(file.getAbsoluteFile());
+			bw = new BufferedWriter(fw);
 		}
-		fw = new FileWriter(file.getAbsoluteFile());
-		bw = new BufferedWriter(fw);
-		generateFile(friend);
-		bw.flush();
-		bw.close();
-	}
-
-	
-	/**
-	 * Generate file creates the initial header set up of a file if
-	 * it has not been created yet.
-	 * 
-	 * @param friend
-	 * @throws IOException
-	 */
-	//No spaces allowed for sas
-	private void generateFile(ArrayList<SteamUser> friend)
-			throws IOException{
+		else if(file.exists()) 
+			fw = new FileWriter(file.getAbsoluteFile(), true);
+			bw = new BufferedWriter(fw);
+			bw.append('\n' + "------------------" + '\n');
 		
-//		bw.write(Global.CounterS+":"+counter+"\n");
-		bw.write(Global.STEAMID+","+Global.RELATION+","
-			+Global.FRIENDS_SINCE+";\n");
-		editFile(friend);
-	}
-	
-	
-	//TODO Complete profile generation
-	private void genearteProfileFile(ArrayList<SteamProfile> profile){
-		//bw.write(Global.STEAMID+",")
-
+		
+		
+		//Denote stop and restart point
+		
 	}
 	
 	
 	/**
-	 * appends to the end of a file.
-	 * 
+	 * Writes friends to the end of the file.
+	 * Form is:
+	 * "ID:Friend1,Friend2,Friend3,...,friendN\\n"
 	 * @param friend
 	 * @throws IOException
 	 */
-	private void editFile(ArrayList<SteamUser> friend) throws IOException{
-		//Organization of stats are
-		//Steam ID, PersonalName, profileurl, avatar(get url for image),visibility status, lastlogoff
-		for(int i=0; i<friend.size(); i++){
-			bw.append(friend.get(i).toSAS_ID());
-		}
+	public void writeFriendsOf(SteamUser friend) throws IOException{
+		bw.append(Long.toString(friend.getID()));
+		bw.append(':');
+		bw.append(friend.getFriendsString());
+		
 	}
 	
 	
-	private void playerFile(ArrayList<SteamProfile> profile) throws IOException{
-		for(int i=0; i<profile.size(); i++){
-			bw.append(profile.get(i).toSaSProfile());
-		}
+	/**
+	 * Writes friends profile to the end of the file.
+	 * Form is:
+	 * "ID:PersonalName,profileurl,avatar(url),avatarmedium(url),
+	 * avatarfull(url),personastate"
+	 * @param profile
+	 * @throws IOException
+	 */
+	public void writeProfileOf(SteamUser profile) throws IOException{
+		bw.append(profile.toSASProfile());
+	}
+	
+	
+	public void flush() throws IOException{
+		bw.flush();
 	}
 }
